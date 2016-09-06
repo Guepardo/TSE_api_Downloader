@@ -1,0 +1,17 @@
+{
+  "name": "crawlertse",
+  "version": "1.0.0",
+  "description": "Um script para coletar informações da api do TSE",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./app.js"
+  },
+  "author": "Allyson Maciel <bsinet@hotmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "mongoose": "^4.6.0",
+    "request": "^2.74.0",
+    "sync-request": "^3.0.1"
+  }
+}
