@@ -44,6 +44,11 @@ Api.prototype.vereadores = function(idCidade){
 	return this.sender(url); 
 }; 
 
+Api.prototype.getInformations = function(idCidade, idCandidato){
+	var url = 'http://divulgacandcontas.tse.jus.br/divulga/rest/v1/candidatura/buscar/2016/'+idCidade+'/2/candidato/'+ idCandidato; 
+	return this.sender(url); 
+}; 
+
 Api.prototype.sleep = function (milliseconds) {
 	var start = new Date().getTime();
 	for (var i = 0; i < 1e7; i++) {

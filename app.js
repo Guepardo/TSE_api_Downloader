@@ -35,32 +35,32 @@ var siglaEstados = [
 
 
 
-function start(){
+function recuperarCicades(){
 	console.log('começando'); 
 
-	//Registrando cidades
-	// for(sigla of siglaEstados){
-	// 	var result = api.municipios(sigla); 
+	// Registrando cidades
+	for(sigla of siglaEstados){
+		var result = api.municipios(sigla); 
 
-	// 	for(cidade of result.municipios){
-	// 		console.log(cidade.nome); 
+		for(cidade of result.municipios){
+			console.log(cidade.nome); 
 
-	// 		var cidade = new Cidade({
-	// 			codigo: cidade.codigo, 
-	// 			nome   : cidade.nome, 
-	// 			estado: sigla
-	// 		}); 
+			var cidade = new Cidade({
+				codigo: cidade.codigo, 
+				nome   : cidade.nome, 
+				estado: sigla
+			}); 
 
-	// 		cidade.save(function(error, ci){
-	// 			if(error)console.log(error.errmsg); 
+			cidade.save(function(error, ci){
+				if(error)console.log(error.errmsg); 
 
-	// 			console.log(ci); 
-	// 		}); 
-	// 	}
-	// }
+				console.log(ci); 
+			}); 
+		}
+	}
+}; 
 
-	
-
+function recuperarCandidatos(){
 	Cidade.count({estado: 'SP', index: false}, function(err, count){
 		console.log('concluído '+ count +' capturadas'); 
 	}); 
@@ -158,8 +158,54 @@ function start(){
 			}); 
 		}
 	}); 
+}; 
 
+
+function normalizarCandidatos(){
+	Candidato.find({}).
+	where('estado').exists(false). 
+	limit(40000).
+	populate('cidade').
+	exec(function(error, candidatos){
+		for(candidato of candidatos){
+			candidato.estado = candidato.cidade.estado; 
+			console.log(candidato);
+			candidato.save(); 
+		}
+		console.log('concluído'); 
+	}); 
 }
 
+function recuperarDescricaoCandidatos(){
+	Candidato.count({estado: 'GO', index: false}, function(error, count){
+		console.log('candidatos de Goias ' + count); 
+	}); 
 
-setTimeout(start, 1000 * 3 ); 
+	Candidato.find({estado : 'GO', index: false}).
+	populate('cidade'). 
+	limit(300).
+	exec((error, candidatos) => {
+		for(candidato of candidatos){
+			var informacoes = api.getInformations(candidato.cidade.codigo, candidato.codigo); 
+
+			candidato.nome       = informacoes.nomeCompleto;
+			candidato.situacao   = informacoes.descricaoSituacao;
+			candidato.grauInstru = informacoes.grauInstrucao;
+			candidato.bens       = informacoes.totalDeBens;
+			candidato.sexo       = informacoes.descricaoSexo;
+			candidato.raca       = informacoes.descricaoCorRaca;
+			candidato.ocupacao   = informacoes.ocupacao;
+
+			candidato.save((error, cam) =>{
+				if(error) return; 
+
+				cam.index = true; 
+				cam.save(); 
+				console.log(cam); 
+			}); 
+		}
+		console.log('concluído'); 
+	}); 
+}; 
+
+setTimeout(recuperarDescricaoCandidatos, 1000 * 3 ); 
